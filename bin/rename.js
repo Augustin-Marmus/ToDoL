@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const fs = require('fs-extra');
 const readline = require('readline');
 const replace = require('replace-in-file');
