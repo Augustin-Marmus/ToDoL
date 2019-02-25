@@ -39,12 +39,14 @@ class LogIn extends React.Component {
         {sended && <ActivityIndicator size="large" />}
         <TextInput
           placeholder="email"
+          keyboardType="email-address"
           onChangeText={(newEmail) => { this.setState({ email: newEmail }); }}
         />
         <TextInput
           secureTextEntry
           placeholder="Password"
           onChangeText={(newPassword) => { this.setState({ password: newPassword }); }}
+          onSubmitEditing={() => this.logIn()}
         />
         <View style={{ margin: 7 }} />
         <Button

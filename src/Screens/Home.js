@@ -1,10 +1,33 @@
 import React from 'react';
-import { Button, View } from 'react-native';
+import { Button, View, Text, FlatList } from 'react-native';
+import FAB from 'react-native-fab';
 import firebase from 'react-native-firebase';
+import ToDoListItem from '../Components/ToDoListItem';
+
+let cpt = 0;
 
 class HomeScreen extends React.Component {
   static navigationOptions = {
-    header: null,
+    title: 'ToDoL',
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      todos: [],
+    };
+  }
+
+  componentDidMount() {
+    this.unsubscribeCollectionTodo = firebase.firestore()
+      .collection('todo').orderBy('date', 'desc')
+      .onSnapshot((querySnapshot) => {
+        this.setState({ todos: querySnapshot.docs.map(doc => doc.ref) });
+      });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribeCollectionTodo();
   }
 
   signOut() {
@@ -16,13 +39,34 @@ class HomeScreen extends React.Component {
       });
   }
 
+  addTodo() {
+    const { navigation } = this.props;
+    navigation.navigate(
+      'ToDo',
+      firebase.firestore().collection('todo').add({ name: `test${cpt++}`, complete: false, date: Date.now() }),
+    );
+  }
+
   render() {
     const { navigation } = this.props;
+    const { todos } = this.state;
     return (
-      <View>
-        <Button title="Actually, sign me out :)" onPress={() => this.signOut()} />
-        <Button title="Go to TODO" onPress={() => navigation.navigate('ToDo')} />
-        <Button title="Add TODO" onPress={() => navigation.navigate('ToDo')} />
+      <View style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
+          <FlatList
+            data={todos}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => <ToDoListItem model={item} action={() => navigation.navigate('ToDo', item.ref)} />}
+          />
+          <FAB
+            buttonColor="#1f9eef"
+            iconTextColor="#FFFFFF"
+            onClickAction={() => this.addTodo()}
+            visible
+            iconTextComponent={<Text>+</Text>}
+          />
+        </View>
+        <Button title="Sign me out" onPress={() => this.signOut()} />
       </View>
     );
   }
