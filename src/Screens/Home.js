@@ -20,7 +20,8 @@ class HomeScreen extends React.Component {
 
   componentDidMount() {
     this.unsubscribeCollectionTodo = firebase.firestore()
-      .collection('todo').orderBy('date', 'desc')
+      .collection('todos')
+      .where('owner', '==', firebase.auth().currentUser.uid)
       .onSnapshot((querySnapshot) => {
         this.setState({ todos: querySnapshot.docs.map(doc => doc.ref) });
       });
@@ -43,7 +44,14 @@ class HomeScreen extends React.Component {
     const { navigation } = this.props;
     navigation.navigate(
       'ToDo',
-      firebase.firestore().collection('todo').add({ name: `test${cpt++}`, complete: false, date: Date.now() }),
+      firebase.firestore()
+        .collection('todos')
+        .add({
+          name: `test${cpt++}`,
+          complete: false,
+          date: Date.now(),
+          owner: firebase.auth().currentUser.uid,
+        }),
     );
   }
 

@@ -7,6 +7,7 @@ class ToDoListItem extends React.Component {
     this.state = {
       complete: false,
       name: '',
+      date: null,
     };
   }
 
