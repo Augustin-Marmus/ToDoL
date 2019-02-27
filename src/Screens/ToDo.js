@@ -8,6 +8,10 @@ import {
 } from 'react-native';
 
 class ToDoScreen extends React.Component {
+  static navigationOptions = {
+    title: 'ToDo details',
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -53,22 +57,31 @@ class ToDoScreen extends React.Component {
     const { navigation } = this.props;
     const { name, complete } = this.state;
     return (
-      <View style={{ flex: 1, justifyContent: 'center', verticalAlign: 'center', paddingVertical: 20 }}>
+      <View style={{ flex: 1, justifyContent: 'center', verticalAlign: 'center', padding: 20 }}>
         <Text style={{ fontSize: 27 }}>
           Edit
         </Text>
-        <CheckBox
-          onValueChange={() => this.toggleCheck()}
-          value={complete}
-        />
-        <Text>Name :</Text>
-        <TextInput
-          placeholder="name"
-          value={name}
-          onChangeText={(newName) => { this.setState({ name: newName }); }}
-          onSubmitEditing={() => { this.save(); navigation.goBack(); }}
-        />
-        <View style={{ margin: 7 }} />
+        <View style={{ flexDirection: 'row', paddingTop: 10 }}>
+          <View style={{ flexDirection: 'column', justifyContent: 'center' }}>
+            <Text>
+              Completed :
+            </Text>
+          </View>
+          <CheckBox
+            onValueChange={() => this.toggleCheck()}
+            value={complete}
+          />
+        </View>
+        <View style={{ paddingTop: 10 }}>
+          <Text>Name :</Text>
+          <TextInput
+            placeholder="name"
+            value={name}
+            onChangeText={(newName) => { this.setState({ name: newName }); }}
+            onSubmitEditing={() => { this.save(); navigation.goBack(); }}
+          />
+        </View>
+        <View />
         <Button
           onPress={() => { this.save(); navigation.goBack(); }}
           title="Save"

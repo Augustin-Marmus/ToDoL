@@ -1,10 +1,8 @@
 import React from 'react';
-import { Button, View, Text, FlatList } from 'react-native';
+import { Button, View, FlatList } from 'react-native';
 import FAB from 'react-native-fab';
 import firebase from 'react-native-firebase';
 import ToDoListItem from '../Components/ToDoListItem';
-
-let cpt = 0;
 
 class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -48,7 +46,7 @@ class HomeScreen extends React.Component {
     firebase.firestore()
       .collection('todos')
       .add({
-        name: `test${cpt++}`,
+        name: 'new task',
         complete: false,
         date: Date.now(),
         owner: firebase.auth().currentUser.uid,
