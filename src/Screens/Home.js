@@ -22,9 +22,12 @@ class HomeScreen extends React.Component {
     this.unsubscribeCollectionTodo = firebase.firestore()
       .collection('todos')
       .where('owner', '==', firebase.auth().currentUser.uid)
-      .onSnapshot((querySnapshot) => {
-        this.setState({ todos: querySnapshot.docs.map(doc => doc.ref) });
-      });
+      .onSnapshot(
+        (querySnapshot) => {
+          this.setState({ todos: querySnapshot.docs.map(doc => doc.ref) });
+        },
+        () => { },
+      );
   }
 
   componentWillUnmount() {
@@ -42,21 +45,27 @@ class HomeScreen extends React.Component {
 
   addTodo() {
     const { navigation } = this.props;
-    navigation.navigate(
-      'ToDo',
-      firebase.firestore()
-        .collection('todos')
-        .add({
-          name: `test${cpt++}`,
-          complete: false,
-          date: Date.now(),
-          owner: firebase.auth().currentUser.uid,
-        }),
+    firebase.firestore()
+      .collection('todos')
+      .add({
+        name: `test${cpt++}`,
+        complete: false,
+        date: Date.now(),
+        owner: firebase.auth().currentUser.uid,
+      }).then(ref => navigation.navigate({ routeName: 'ToDo', params: { model: ref } }));
+  }
+
+  renderItem(item) {
+    const { navigation } = this.props;
+    return (
+      <ToDoListItem
+        model={item}
+        action={ref => navigation.navigate({ routeName: 'ToDo', params: { model: ref } })}
+      />
     );
   }
 
   render() {
-    const { navigation } = this.props;
     const { todos } = this.state;
     return (
       <View style={{ flex: 1 }}>
@@ -64,14 +73,13 @@ class HomeScreen extends React.Component {
           <FlatList
             data={todos}
             keyExtractor={item => item.id}
-            renderItem={({ item }) => <ToDoListItem model={item} action={() => navigation.navigate('ToDo', item.ref)} />}
+            renderItem={({ item }) => this.renderItem(item)}
           />
           <FAB
             buttonColor="#1f9eef"
             iconTextColor="#FFFFFF"
             onClickAction={() => this.addTodo()}
             visible
-            iconTextComponent={<Text>+</Text>}
           />
         </View>
         <Button title="Sign me out" onPress={() => this.signOut()} />

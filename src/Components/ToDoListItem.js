@@ -7,15 +7,21 @@ class ToDoListItem extends React.Component {
     this.state = {
       complete: false,
       name: '',
-      date: null,
     };
   }
 
   componentDidMount() {
     const { model } = this.props;
-    this.unsubscribeModel = model.onSnapshot((result) => {
-      this.setState(result.data());
-    });
+    this.unsubscribeModel = model.onSnapshot(
+      (result) => {
+        this.setState(result.data());
+      },
+      // Avoid exception from this firestore
+      // When item created TodoListItem is created before db insertion
+      // And an PERMISSION_DENIED error pop for nothing
+      // because the element we request does not exists
+      () => { },
+    );
   }
 
   componentWillUnmount() {
@@ -29,10 +35,10 @@ class ToDoListItem extends React.Component {
   }
 
   render() {
-    const { action } = this.props;
+    const { action, model } = this.props;
     const { name, complete } = this.state;
     return (
-      <TouchableNativeFeedback onPress={action}>
+      <TouchableNativeFeedback onPress={() => action(model)}>
         <View style={{ flex: 1, flexDirection: 'row', padding: 10 }}>
           <CheckBox
             onValueChange={() => this.toggleCheck()}
